@@ -80,57 +80,61 @@ def recognize_gesture(hand_landmarks, hand_label):
     else:
         return "Unknown gesture"
 
-while cap.isOpened():
-    success, image = cap.read()
-    if not success:
-        print("Ignoring empty camera frame.")
-        continue
-    
-    # Flip the image horizontally for a selfie-view display
-    image = cv2.flip(image, 1)
-    
-    # Convert the BGR image to RGB
-    image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    
-    # Process the image and detect hands
-    results = hands.process(image_rgb)
-    
-    # Draw hand landmarks
-    if results.multi_hand_landmarks:
-        for i, hand_landmarks in enumerate(results.multi_hand_landmarks):
-            # Label hand as left or right
-            hand_label = results.multi_handedness[i].classification[0].label
-            # Draw landmarks
-            mp_drawing.draw_landmarks(
-                image,
-                hand_landmarks,
-                mp_hands.HAND_CONNECTIONS,
-                mp_drawing_styles.get_default_hand_landmarks_style(),
-                mp_drawing_styles.get_default_hand_connections_style()
-            )
-            
-            
-            # Regocnize and display gesture on screen
-            gesture = recognize_gesture(hand_landmarks, hand_label)
-            cv2.putText(image, f"Gesture: {gesture}", (10, 30), 
-                        cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
-            
-            # Print gesture to console
-            # print(f"Detected gesture: {gesture}")
-    
-    # Display the resulting frame
-    cv2.imshow('Hand Gesture Recognition', image)
-    
-    # Exit on 'q' key press
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
+def main():
+    while cap.isOpened():
+        success, image = cap.read()
+        if not success:
+            print("Ignoring empty camera frame.")
+            continue
+        
+        # Flip the image horizontally for a selfie-view display
+        image = cv2.flip(image, 1)
+        
+        # Convert the BGR image to RGB
+        image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        
+        # Process the image and detect hands
+        results = hands.process(image_rgb)
+        
+        # Draw hand landmarks
+        if results.multi_hand_landmarks:
+            for i, hand_landmarks in enumerate(results.multi_hand_landmarks):
+                # Label hand as left or right
+                hand_label = results.multi_handedness[i].classification[0].label
+                # Draw landmarks
+                mp_drawing.draw_landmarks(
+                    image,
+                    hand_landmarks,
+                    mp_hands.HAND_CONNECTIONS,
+                    mp_drawing_styles.get_default_hand_landmarks_style(),
+                    mp_drawing_styles.get_default_hand_connections_style()
+                )
+                
+                
+                # Regocnize and display gesture on screen
+                gesture = recognize_gesture(hand_landmarks, hand_label)
+                cv2.putText(image, f"Gesture: {gesture}", (10, 30), 
+                            cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
+                
+                # Print gesture to console
+                # print(f"Detected gesture: {gesture}")
+        
+        # Display the resulting frame
+        cv2.imshow('Hand Gesture Recognition', image)
+        
+        # Exit on 'q' key press
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
 
-    # Find distance between thumb and index finger tips
-    if cv2.waitKey(1) & 0xFF == ord('d'): 
-        thumb_tip = hand_landmarks.landmark[mp_hands.HandLandmark.THUMB_TIP]
-        index_tip = hand_landmarks.landmark[mp_hands.HandLandmark.INDEX_FINGER_TIP]
-        print(calculate_distance(thumb_tip, index_tip))
+        # Find distance between thumb and index finger tips
+        if cv2.waitKey(1) & 0xFF == ord('d'): 
+            thumb_tip = hand_landmarks.landmark[mp_hands.HandLandmark.THUMB_TIP]
+            index_tip = hand_landmarks.landmark[mp_hands.HandLandmark.INDEX_FINGER_TIP]
+            print(calculate_distance(thumb_tip, index_tip))
 
-cap.release()
-cv2.VideoCapture(0).release()
-cv2.destroyAllWindows()
+    cap.release()
+    cv2.VideoCapture(0).release()
+    cv2.destroyAllWindows()
+
+if __name__ == "__main__":
+    main()
